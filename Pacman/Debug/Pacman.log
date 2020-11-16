@@ -1,0 +1,45 @@
+﻿  Pacman.cpp
+D:\Visual Studio Community 2019\VC\Tools\MSVC\14.28.29333\include\vector(1750,1): warning C4251: 'std::vector<S2D::Input::Keys,std::allocator<S2D::Input::Keys>>::_Mypair': class 'std::_Compressed_pair<std::allocator<S2D::Input::Keys>,std::_Vector_val<std::_Simple_types<_Ty>>,true>' needs to have dll-interface to be used by clients of class 'std::vector<S2D::Input::Keys,std::allocator<S2D::Input::Keys>>'
+          with
+          [
+              _Ty=S2D::Input::Keys
+          ]
+D:\Visual Studio Community 2019\VC\Tools\MSVC\14.28.29333\include\vector(1750): message : see declaration of 'std::_Compressed_pair<std::allocator<S2D::Input::Keys>,std::_Vector_val<std::_Simple_types<_Ty>>,true>'
+          with
+          [
+              _Ty=S2D::Input::Keys
+          ]
+D:\Programming\FOGGS\Pacman\Pacman\S2D\Input.h(108): message : see reference to class template instantiation 'std::vector<S2D::Input::Keys,std::allocator<S2D::Input::Keys>>' being compiled
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(15,12): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(45,18): warning C4156: deletion of an array expression without using the array form of 'delete'; array form substituted
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(45,18): warning C4154: deletion of an array expression; conversion to pointer supplied
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(65,79): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(65,40): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(134,47): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(135,55): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(148,56): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(149,55): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(174,32): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(175,32): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(222,29): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(223,29): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(248,28): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(251,52): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(254,28): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(257,53): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(288,58): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(289,66): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+  main.cpp
+D:\Visual Studio Community 2019\VC\Tools\MSVC\14.28.29333\include\vector(1750,1): warning C4251: 'std::vector<S2D::Input::Keys,std::allocator<S2D::Input::Keys>>::_Mypair': class 'std::_Compressed_pair<std::allocator<S2D::Input::Keys>,std::_Vector_val<std::_Simple_types<_Ty>>,true>' needs to have dll-interface to be used by clients of class 'std::vector<S2D::Input::Keys,std::allocator<S2D::Input::Keys>>'
+          with
+          [
+              _Ty=S2D::Input::Keys
+          ]
+D:\Visual Studio Community 2019\VC\Tools\MSVC\14.28.29333\include\vector(1750): message : see declaration of 'std::_Compressed_pair<std::allocator<S2D::Input::Keys>,std::_Vector_val<std::_Simple_types<_Ty>>,true>'
+          with
+          [
+              _Ty=S2D::Input::Keys
+          ]
+D:\Programming\FOGGS\Pacman\Pacman\S2D\Input.h(108): message : see reference to class template instantiation 'std::vector<S2D::Input::Keys,std::allocator<S2D::Input::Keys>>' being compiled
+  Generating Code...
+  Pacman.vcxproj -> D:\Programming\FOGGS\Pacman\Debug\Pacman.exe

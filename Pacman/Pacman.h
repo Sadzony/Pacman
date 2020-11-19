@@ -7,7 +7,7 @@
 #pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")
 #endif
 #endif
-#define MUNCHIECOUNT 50
+#define MUNCHIECOUNT 12
 #define GHOSTCOUNT 4
 
 // Just need to include main header file
@@ -58,7 +58,10 @@ class Grid {
 	const Vector2* origin = new Vector2(0, 0);
 public:
 	vector <Wall*> walls;
+	PickUp* _munchies[MUNCHIECOUNT];
 	void GenerateMap();
+	void CreateWall(int i, int k, Texture2D* wallText);
+	void CreateMunchie(int i, int k, Texture2D* munchieTexture, int& m);
 };
 class Pacman : public Game
 {
@@ -66,7 +69,6 @@ private:
 	Grid* grid;
 	Player* _pacman;
 	PickUp* _cherry;
-	PickUp* _munchies[MUNCHIECOUNT];
 	Enemy* _ghosts[GHOSTCOUNT];
 	//start string data
 	int _frameCount;

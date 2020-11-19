@@ -43,7 +43,6 @@ Pacman::~Pacman()
 		delete grid->walls.at(i)->texture;
 		delete grid->walls.at(i);
 	}
-	
 	for (int i = 0; i < MUNCHIECOUNT; i++) {
 		delete grid->_munchies[i]->sourceRect;
 		delete grid->_munchies[i]->texture;

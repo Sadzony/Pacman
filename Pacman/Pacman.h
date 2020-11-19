@@ -7,7 +7,7 @@
 #pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")
 #endif
 #endif
-#define MUNCHIECOUNT 12
+#define MUNCHIECOUNT 362
 #define GHOSTCOUNT 4
 
 // Just need to include main header file

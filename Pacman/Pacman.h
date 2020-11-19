@@ -8,9 +8,12 @@
 #endif
 #endif
 #define MUNCHIECOUNT 50
+#define GHOSTCOUNT 4
+
 // Just need to include main header file
 #include "S2D/S2D.h"
 #include <time.h>
+#include <vector>
 // Reduces the amount of typing by including all classes in S2D namespace
 using namespace S2D;
 
@@ -18,6 +21,7 @@ using namespace S2D;
 // This allows us to overload the Game class methods to help us
 // load content, draw and update our game.
 struct Player {
+	bool dead;
 	Vector2* position;
 	Rect* sourceRect;
 	Texture2D* texture;
@@ -37,13 +41,33 @@ struct PickUp {
 	int frameCount;
 	Texture2D* texture;
 };
-
+struct Enemy {
+	Vector2* position;
+	Texture2D* texture;
+	Rect* sourceRect;
+	int direction;
+	const float speed = 0.15f;
+};
+struct Wall {
+	Vector2* position;
+	Texture2D* texture;
+};
+class Grid {
+	const int horizontalBlocks = 1024 / 32;
+	const int verticalBlocks = 768 / 32;
+	const Vector2* origin = new Vector2(0, 0);
+public:
+	vector <Wall*> walls;
+	void GenerateMap();
+};
 class Pacman : public Game
 {
 private:
+	Grid* grid;
 	Player* _pacman;
 	PickUp* _cherry;
 	PickUp* _munchies[MUNCHIECOUNT];
+	Enemy* _ghosts[GHOSTCOUNT];
 	//start string data
 	int _frameCount;
 	Vector2* _startStringPosition;
@@ -82,6 +106,9 @@ private:
 	//Update methods
 	void UpdatePacman(int elapsedTime);
 	void UpdateMunchie(int elpsedTime);
+	//ghosts methods
+	void UpdateGhost(Enemy* ghost, int elapsedTime);
+	void CheckGhostCollisions();
 public:
 	/// <summary> Constructs the Pacman class. </summary>
 	Pacman(int argc, char* argv[]);
@@ -99,3 +126,4 @@ public:
 	void virtual Draw(int elapsedTime);
 
 };
+

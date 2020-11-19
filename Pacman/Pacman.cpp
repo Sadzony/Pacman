@@ -3,22 +3,29 @@
 
 Pacman::Pacman(int argc, char* argv[]) : Game(argc, argv)
 {
+	grid = new Grid();
 	_pacman = new Player();
 	_pacman->direction = 0;
 	_pacman->frame = 0;
 	_pacman->currentFrameTime = 0;
 	_pacman->speedMultiplier = 1.0f;
+	_pacman->dead = false;
 	cherryChangedPosition = false;
 	_cherry = new PickUp();
 	_cherry->frameCount = 0;
 	_cherry->currentFrameTime = 0;
 	srand(time(NULL));
+	//initialise munchies
 	for (int i = 0; i < MUNCHIECOUNT; i++) {
 		_munchies[i] = new PickUp();
 		_munchies[i]->currentFrameTime = 0;
 		_munchies[i]->frameTime = rand() % 500 + 50;
 	}
-
+	//initialise ghosts
+	for (int i = 0; i < GHOSTCOUNT; i++) {
+		_ghosts[i] = new Enemy();
+		_ghosts[i]->direction = 0;
+	}
 	_frameCount = 0;
 	_started = false;
 	_paused = false;
@@ -43,6 +50,14 @@ Pacman::~Pacman()
 		delete _munchies[i];
 	}
 	delete _munchies;
+	for (int i = 0; i < GHOSTCOUNT; i++) {
+		delete _ghosts[i]->sourceRect;
+		delete _ghosts[i]->texture;
+		delete _ghosts[i]->position;
+		delete _ghosts[i];
+	}
+	delete _ghosts;
+
 	delete _pacman->texture;
 	delete _pacman->sourceRect;
 	delete _pacman->position;
@@ -66,15 +81,22 @@ void Pacman::LoadContent()
 		_munchies[i]->sourceRect = new Rect(0.0f, 0.0f, 12, 12);
 
 	}
-
+	//load ghosts
+	for (int i = 0; i < GHOSTCOUNT; i++) {
+		_ghosts[i]->texture = new Texture2D();
+		_ghosts[i]->texture->Load("Textures/GhostBlue.png", false);
+		_ghosts[i]->position = new Vector2(rand() % Graphics::GetViewportWidth(), rand() % Graphics::GetViewportHeight());
+		_ghosts[i]->sourceRect = new Rect(0.0f, 0.0f, 20, 20);
+	}
 	//Load Cherry
 	_cherry->texture = new Texture2D();
 	_cherry->texture->Load("Textures/Cherry.png", true);
 	_cherry->rect = new Rect(200.0f, 450.0f, 32, 32);
 	_cherry->sourceRect = new Rect(0.0f, 0.0f, 32, 32);
+	//Load Grid
+	grid->GenerateMap();
 	// Set string position
 	_stringPosition = new Vector2(10.0f, 25.0f);
-
 	//Load Pause menu
 	_menuBackground = new Texture2D();
 	_menuBackground->Load("Textures/Transparency.png", false);
@@ -102,6 +124,10 @@ void Pacman::Update(int elapsedTime)
 			Input(elapsedTime, keyboardState, mouseState);
 			UpdatePacman(elapsedTime);
 			CheckViewportColl();
+			for (int i = 0; i < GHOSTCOUNT; i++) {
+				UpdateGhost(_ghosts[i], elapsedTime);
+			}
+			CheckGhostCollisions();
 		}
 
 	}
@@ -114,9 +140,6 @@ void Pacman::Update(int elapsedTime)
 }
 void Pacman::Draw(int elapsedTime)
 {
-	// Allows us to easily create a string
-	std::stringstream stream;
-	stream << "Pacman X: " << _pacman->position->X << " Y: " << _pacman->position->Y;
 
 	SpriteBatch::BeginDraw(); // Starts Drawing
 
@@ -148,10 +171,13 @@ void Pacman::Draw(int elapsedTime)
 		_pacman->sourceRect->Y = _pacman->sourceRect->Height * _pacman->direction;
 		_pacman->sourceRect->X = _pacman->sourceRect->Width * _pacman->frame;
 	}
-	SpriteBatch::Draw(_pacman->texture, _pacman->position, _pacman->sourceRect);
+	if (!_pacman->dead) {
+		SpriteBatch::Draw(_pacman->texture, _pacman->position, _pacman->sourceRect);
+	}
+	for (int i = 0; i < GHOSTCOUNT; i++) {
+		SpriteBatch::Draw(_ghosts[i]->texture, _ghosts[i]->position, _ghosts[i]->sourceRect);
+	}
 	UpdateMunchie(elapsedTime);
-	// Draws String
-	SpriteBatch::DrawString(stream.str().c_str(), _stringPosition, Color::Green);
 	if (_paused) {
 		std::stringstream menuStream;
 		menuStream << "PAUSED!";
@@ -165,6 +191,9 @@ void Pacman::Draw(int elapsedTime)
 		if (_frameCount < 30) {
 			SpriteBatch::DrawString(startStream.str().c_str(), _startStringPosition, Color::White);
 		}
+	}
+	for (int i = 0; i < grid->walls.size(); i++) {
+		SpriteBatch::Draw(grid->walls.at(i)->texture, grid->walls.at(i)->position);
 	}
 	SpriteBatch::EndDraw(); // Ends Drawing
 }
@@ -291,5 +320,126 @@ void Pacman::UpdateMunchie(int elapsedTime) {
 	}
 	for (int i = 0; i < MUNCHIECOUNT; i++) {
 		SpriteBatch::Draw(_munchies[i]->texture, _munchies[i]->rect, _munchies[i]->sourceRect);
+	}
+}
+void Pacman::CheckGhostCollisions() {
+	int i = 0;
+	int bottom1 = _pacman->position->Y + _pacman->sourceRect->Height;
+	int bottom2 = 0;
+	int left1 = _pacman->position->X;
+	int left2 = 0;
+	int right1 = _pacman->position->X + _pacman->sourceRect->Width;
+	int right2 = 0;
+	int top1 = _pacman->position->Y;
+	int top2 = 0;
+	for (i = 0; i < GHOSTCOUNT; i++) {
+		bottom2 = _ghosts[i]->position->Y + _ghosts[i]->sourceRect->Height;
+		left2 = _ghosts[i]->position->X;
+		right2 = _ghosts[i]->position->X + _ghosts[i]->sourceRect->Width;
+		top2 = _ghosts[i]->position->Y;
+		if (bottom1 > top2 && top1<bottom2 && right1 >left2 && left1 < right2) {
+			_pacman->dead = true;
+			i = GHOSTCOUNT;
+		}
+	}
+}
+void Pacman::UpdateGhost(Enemy* ghost, int elapsedTime) {
+	if (ghost->direction == 0) {
+		ghost->position->X += ghost->speed * elapsedTime;
+	}
+	else if (ghost->direction == 1) {
+		ghost->position->X -= ghost->speed * elapsedTime;
+	}
+	if (ghost->position->X + ghost->sourceRect->Width >= Graphics::GetViewportWidth()) {
+		ghost->direction = 1;
+	}
+	else if (ghost->position->X <= 0) {
+		ghost->direction = 0;
+	}
+}
+void Grid::GenerateMap() {
+	Texture2D* wallText = new Texture2D();
+	wallText->Load("Textures/wall.png", false);
+	for (int k = 0; k < verticalBlocks; k++) {
+		for (int i = 0; i < horizontalBlocks; i++) {
+			if (k == 0) {
+				if (i < 15 || i > 18) {
+					Wall* nextWall = new Wall();
+					walls.push_back(nextWall);
+					nextWall->position = new Vector2(32 * i, 24 * k);
+					nextWall->texture = wallText;
+				}
+				//else generate munchie there
+			}
+			else if (k == 1) {
+
+			}
+			else if (k == 2) {
+
+			}
+			else if (k == 3) {
+
+			}
+			else if (k == 4) {
+
+			}
+			else if (k == 5) {
+
+			}
+			else if (k == 6) {
+
+			}
+			else if (k == 7) {
+
+			}
+			else if (k == 8) {
+
+			}
+			else if (k == 9) {
+
+			}
+			else if (k == 10) {
+
+			}
+			else if (k == 11) {
+
+			}
+			else if (k == 12) {
+
+			}
+			else if (k == 13) {
+
+			}
+			else if (k == 14) {
+
+			}
+			else if (k == 15) {
+
+			}
+			else if (k == 16) {
+
+			}
+			else if (k == 17) {
+
+			}
+			else if (k == 18) {
+
+			}
+			else if (k == 19) {
+
+			}
+			else if (k == 20) {
+
+			}
+			else if (k == 21) {
+
+			}
+			else if (k == 22) {
+
+			}
+			else if (k == 23) {
+
+			}
+		}
 	}
 }

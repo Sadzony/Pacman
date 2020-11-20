@@ -111,6 +111,7 @@ private:
 	//ghosts methods
 	void UpdateGhost(Enemy* ghost, int elapsedTime);
 	void CheckGhostCollisions();
+	void CheckWallCollisions();
 public:
 	/// <summary> Constructs the Pacman class. </summary>
 	Pacman(int argc, char* argv[]);

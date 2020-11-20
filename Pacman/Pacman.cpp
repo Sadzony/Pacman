@@ -70,7 +70,7 @@ void Pacman::LoadContent()
 	// Load Pacman
 	_pacman->texture = new Texture2D();
 	_pacman->texture->Load("Textures/Pacman.tga", false);
-	_pacman->position = new Vector2(350.0f, 350.0f);
+	_pacman->position = new Vector2(32 * 15, 32 * 18);
 	_pacman->sourceRect = new Rect(0.0f, 0.0f, 32, 32);
 	Texture2D* munchieTexture = new Texture2D();
 	//load ghosts
@@ -176,6 +176,11 @@ void Pacman::Draw(int elapsedTime)
 		SpriteBatch::Draw(_menuBackground, _menuRectangle, nullptr);
 		SpriteBatch::DrawString(menuStream.str().c_str(), _menuStringPosition, Color::Red);
 	}
+	if (_started) {
+		for (int i = 0; i < grid->walls.size(); i++) {
+			SpriteBatch::Draw(grid->walls.at(i)->texture, grid->walls.at(i)->position);
+		}
+	}
 	if (!_started) {
 		std::stringstream startStream;
 		startStream << "Press space to INSERT COIN";
@@ -183,9 +188,6 @@ void Pacman::Draw(int elapsedTime)
 		if (_frameCount < 30) {
 			SpriteBatch::DrawString(startStream.str().c_str(), _startStringPosition, Color::White);
 		}
-	}
-	for (int i = 0; i < grid->walls.size(); i++) {
-		SpriteBatch::Draw(grid->walls.at(i)->texture, grid->walls.at(i)->position);
 	}
 	SpriteBatch::EndDraw(); // Ends Drawing
 }
@@ -347,6 +349,24 @@ void Pacman::UpdateGhost(Enemy* ghost, int elapsedTime) {
 	}
 	else if (ghost->position->X <= 0) {
 		ghost->direction = 0;
+	}
+}
+void Pacman::CheckWallCollisions() {
+	int i = 0;
+	int bottom1 = _pacman->position->Y + _pacman->sourceRect->Height;
+	int bottom2 = 0;
+	int left1 = _pacman->position->X;
+	int left2 = 0;
+	int right1 = _pacman->position->X + _pacman->sourceRect->Width;
+	int right2 = 0;
+	int top1 = _pacman->position->Y;
+	int top2 = 0;
+	for (i = 0; i < grid->walls.size(); i++) {
+		bottom2 = grid->walls.at(i)->position->Y + 32;
+		left2 = grid->walls.at(i)->position->X;
+		right2 = grid->walls.at(i)->position->X + 32;
+		top2 = grid->walls.at(i)->position->Y;
+
 	}
 }
 void Grid::GenerateMap() {

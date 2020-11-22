@@ -38,7 +38,7 @@ struct PickUp {
 	Rect* sourceRect;
 	int frameTime = 500;
 	int currentFrameTime;
-	int frameCount;
+	int frameCount = 0;
 	Texture2D* texture;
 };
 struct Enemy {

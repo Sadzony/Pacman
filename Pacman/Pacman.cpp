@@ -116,6 +116,7 @@ void Pacman::Update(int elapsedTime)
 			Input(elapsedTime, keyboardState, mouseState);
 			UpdatePacman(elapsedTime);
 			CheckViewportColl();
+			CheckWallCollisions();
 			for (int i = 0; i < GHOSTCOUNT; i++) {
 				UpdateGhost(_ghosts[i], elapsedTime);
 			}
@@ -366,6 +367,24 @@ void Pacman::CheckWallCollisions() {
 		left2 = grid->walls.at(i)->position->X;
 		right2 = grid->walls.at(i)->position->X + 32;
 		top2 = grid->walls.at(i)->position->Y;
+		if (bottom1 > top2 && top1<bottom2 && right1 >left2 && left1 < right2) { //collision is detected at walls[i]
+			if (left1 < right2 && right1 > right2) {
+				//update to the right
+				_pacman->position->X = right2;
+			}
+			else  if (right1 > left2 && left1 <left2) {
+				//update to the left
+				_pacman->position->X = left2-32;
+			}
+			if (bottom1 > top2 && top1 < top2) {
+				//update to the top
+				_pacman->position->Y = top2-32;
+			}
+			else if (top1 < bottom2 && bottom1 > bottom2) {
+				//update to the bottom
+				_pacman->position->Y = bottom2;
+			}
+		}
 
 	}
 }

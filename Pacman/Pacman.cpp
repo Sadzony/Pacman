@@ -19,7 +19,9 @@ Pacman::Pacman(int argc, char* argv[]) : Game(argc, argv)
 	//initialise ghosts
 	for (int i = 0; i < GHOSTCOUNT; i++) {
 		_ghosts[i] = new Enemy();
-		_ghosts[i]->direction = 0;
+		_ghosts[i]->directionX = 0;
+		_ghosts[i]->directionY = 0;
+
 	}
 	_frameCount = 0;
 	_started = false;
@@ -54,6 +56,7 @@ Pacman::~Pacman()
 		delete _ghosts[i]->sourceRect;
 		delete _ghosts[i]->texture;
 		delete _ghosts[i]->position;
+		delete _ghosts[i]->gridPos;
 		delete _ghosts[i];
 	}
 	delete _ghosts;
@@ -77,7 +80,8 @@ void Pacman::LoadContent()
 	for (int i = 0; i < GHOSTCOUNT; i++) {
 		_ghosts[i]->texture = new Texture2D();
 		_ghosts[i]->texture->Load("Textures/GhostBlue.png", false);
-		_ghosts[i]->position = new Vector2(rand() % Graphics::GetViewportWidth(), rand() % Graphics::GetViewportHeight());
+		_ghosts[i]->position = new Vector2((32*14)+(32*i), (32*11));
+		_ghosts[i]->gridPos = new Vector2(0, 0);
 		_ghosts[i]->sourceRect = new Rect(0.0f, 0.0f, 20, 20);
 	}
 	//Load Cherry
@@ -86,7 +90,7 @@ void Pacman::LoadContent()
 	_cherry->rect = new Rect(200.0f, 450.0f, 32, 32);
 	_cherry->sourceRect = new Rect(0.0f, 0.0f, 32, 32);
 	//Load Grid
-	grid->GenerateMap();
+	grid->GenerateMap(grid);
 	// Set string position
 	_stringPosition = new Vector2(10.0f, 25.0f);
 	//Load Pause menu
@@ -118,7 +122,7 @@ void Pacman::Update(int elapsedTime)
 			CheckViewportColl();
 			CheckWallCollisions();
 			for (int i = 0; i < GHOSTCOUNT; i++) {
-				UpdateGhost(_ghosts[i], elapsedTime);
+				UpdateGhost(_ghosts[i], elapsedTime, *grid);
 			}
 			CheckGhostCollisions();
 		}
@@ -282,7 +286,14 @@ void Pacman::CheckViewportColl() {
 	}
 
 }
-
+void Pacman::findGridPosition(const Vector2 &position, Vector2 &gridPos) {
+	float gridPosUnroundedX = position.X / 32;
+	float gridPosUnroundedY = position.Y / 24;
+	int gridPosX = (int)(round(gridPosUnroundedX));
+	int gridPosY = (int)(round(gridPosUnroundedY));
+	gridPos.X = gridPosX;
+	gridPos.Y = gridPosY;
+}
 void Pacman::UpdatePacman(int elapsedTime) {
 	float pacmanFinalSpeed = _pacman->speed * _pacman->speedMultiplier;
 	if (movingXPositive) {
@@ -338,19 +349,9 @@ void Pacman::CheckGhostCollisions() {
 		}
 	}
 }
-void Pacman::UpdateGhost(Enemy* ghost, int elapsedTime) {
-	if (ghost->direction == 0) {
-		ghost->position->X += ghost->speed * elapsedTime;
-	}
-	else if (ghost->direction == 1) {
-		ghost->position->X -= ghost->speed * elapsedTime;
-	}
-	if (ghost->position->X + ghost->sourceRect->Width >= Graphics::GetViewportWidth()) {
-		ghost->direction = 1;
-	}
-	else if (ghost->position->X <= 0) {
-		ghost->direction = 0;
-	}
+void Pacman::UpdateGhost(Enemy* ghost, int elapsedTime, const Grid& grid) {
+	findGridPosition(*ghost->position, *ghost->gridPos);
+
 }
 void Pacman::CheckWallCollisions() {
 	int i = 0;
@@ -386,9 +387,9 @@ void Pacman::CheckWallCollisions() {
 			}
 		}
 
-	}
+	}	
 }
-void Grid::GenerateMap() {
+void Grid::GenerateMap(Grid *grid) {
 	Texture2D* wallText = new Texture2D();
 	Texture2D* munchieTexture = new Texture2D();
 	int m = 0;
@@ -398,222 +399,222 @@ void Grid::GenerateMap() {
 		for (int i = 0; i < horizontalBlocks / 2; i++) {
 			if (k == 0) {
 				if (i < 14) {
-					CreateWall(i, k, wallText);
+					CreateWall(i, k, wallText, *grid);
 				}
 				else {
-					CreateMunchie(i, k, munchieTexture, m);
+					CreateMunchie(i, k, munchieTexture, m, *grid);
 				}
 			}
 			else if (k == 1) {
 				if (i < 1 || i == 15) {
-					CreateWall(i, k, wallText);
+					CreateWall(i, k, wallText, *grid);
 				}
 				else {
-					CreateMunchie(i, k, munchieTexture, m);
+					CreateMunchie(i, k, munchieTexture, m, *grid);
 				}
 			}
 			else if (k == 2) {
 				if (i == 0 || i == 2 || i == 4 || i == 5 || i == 7 || (i >= 9 && i <= 13) || i == 15) {
-					CreateWall(i, k, wallText);
+					CreateWall(i, k, wallText, *grid);
 				}
 				else {
-					CreateMunchie(i, k, munchieTexture, m);
+					CreateMunchie(i, k, munchieTexture, m, *grid);
 				}
 			}
 			else if (k == 3) {
 				if (i == 0 || i == 2 || i == 4 || i == 5 || i == 7 || i == 15) {
 
-					CreateWall(i, k, wallText);
+					CreateWall(i, k, wallText, *grid);
 				}
 				else {
-					CreateMunchie(i, k, munchieTexture, m);
+					CreateMunchie(i, k, munchieTexture, m, *grid);
 				}
 
 			}
 			else if (k == 4) {
 				if (i == 0 || i == 2 || i == 4 || i == 5 || i == 7 || (i >= 9 && i <= 15)) {
 
-					CreateWall(i, k, wallText);
+					CreateWall(i, k, wallText, *grid);
 				}
 				else {
-					CreateMunchie(i, k, munchieTexture, m);
+					CreateMunchie(i, k, munchieTexture, m, *grid);
 				}
 			}
 			else if (k == 5) {
 				if (i == 0 || (i >= 2 && i <= 7) || i == 15) {
 
-					CreateWall(i, k, wallText);
+					CreateWall(i, k, wallText, *grid);
 				}
 				else {
-					CreateMunchie(i, k, munchieTexture, m);
+					CreateMunchie(i, k, munchieTexture, m, *grid);
 				}
 			}
 			else if (k == 6) {
 				if (i == 0 || (i >= 9 && i <= 13) || i == 15) {
 
-					CreateWall(i, k, wallText);
+					CreateWall(i, k, wallText, *grid);
 				}
 				else {
-					CreateMunchie(i, k, munchieTexture, m);
+					CreateMunchie(i, k, munchieTexture, m, *grid);
 				}
 			}
 			else if (k == 7) {
 				if (i == 0 || i == 2 || (i >= 4 && i <= 7) || (i >= 9 && i <= 13) || i == 15) {
 
-					CreateWall(i, k, wallText);
+					CreateWall(i, k, wallText, *grid);
 				}
 				else {
-					CreateMunchie(i, k, munchieTexture, m);
+					CreateMunchie(i, k, munchieTexture, m, *grid);
 				}
 			}
 			else if (k == 8) {
 				if (i == 0 || i == 2 || (i >= 4 && i <= 5) || (i >= 9 && i <= 13)) {
 
-					CreateWall(i, k, wallText);
+					CreateWall(i, k, wallText, *grid);
 				}
 				else {
-					CreateMunchie(i, k, munchieTexture, m);
+					CreateMunchie(i, k, munchieTexture, m, *grid);
 				}
 			}
 			else if (k == 9) {
 				if (i == 0 || i == 2 || (i >= 4 && i <= 5) || i == 7) {
 
-					CreateWall(i, k, wallText);
+					CreateWall(i, k, wallText, *grid);
 				}
 				else {
-					CreateMunchie(i, k, munchieTexture, m);
+					CreateMunchie(i, k, munchieTexture, m, *grid);
 				}
 			}
 			else if (k == 10) {
 				if (i == 2 || (i >= 4 && i <= 5) || i == 7 || (i >= 11 && i <= 14)) {
 
-					CreateWall(i, k, wallText);
+					CreateWall(i, k, wallText, *grid);
 				}
 				else {
-					CreateMunchie(i, k, munchieTexture, m);
+					CreateMunchie(i, k, munchieTexture, m, *grid);
 				}
 			}
 			else if (k == 11) {
 				if (i == 1 || i == 2 || (i >= 4 && i <= 5) || (i >= 7 && i <= 9) || i == 11) {
 
-					CreateWall(i, k, wallText);
+					CreateWall(i, k, wallText, *grid);
 				}
 				else {
-					CreateMunchie(i, k, munchieTexture, m);
+					CreateMunchie(i, k, munchieTexture, m, *grid);
 				}
 			}
 			else if (k == 12) {
 				if (i == 1 || i == 2 || (i >= 4 && i <= 5) || i == 7 || (i >= 11 && i <= 15)) {
 
-					CreateWall(i, k, wallText);
+					CreateWall(i, k, wallText, *grid);
 				}
 				else {
-					CreateMunchie(i, k, munchieTexture, m);
+					CreateMunchie(i, k, munchieTexture, m, *grid);
 				}
 			}
 			else if (k == 13) {
 				if (i == 2 || (i >= 4 && i <= 5) || i == 7 || i == 9) {
 
-					CreateWall(i, k, wallText);
+					CreateWall(i, k, wallText, *grid);
 				}
 				else {
-					CreateMunchie(i, k, munchieTexture, m);
+					CreateMunchie(i, k, munchieTexture, m, *grid);
 				}
 
 			}
 			else if (k == 14) {
 				if (i == 0 || i == 2 || (i >= 4 && i <= 5) || (i >= 9 && i <= 15)) {
 
-					CreateWall(i, k, wallText);
+					CreateWall(i, k, wallText, *grid);
 				}
 				else {
-					CreateMunchie(i, k, munchieTexture, m);
+					CreateMunchie(i, k, munchieTexture, m, *grid);
 				}
 			}
 			else if (k == 15) {
 				if (i == 0 || i == 2 || (i >= 4 && i <= 5) || i == 7) {
 
-					CreateWall(i, k, wallText);
+					CreateWall(i, k, wallText, *grid);
 				}
 				else {
-					CreateMunchie(i, k, munchieTexture, m);
+					CreateMunchie(i, k, munchieTexture, m, *grid);
 				}
 			}
 			else if (k == 16) {
 				if (i == 0 || i == 2 || (i >= 4 && i <= 5) || i == 7 || (i >= 9 && i <= 11) || (i >= 13 && i <= 15)) {
 
-					CreateWall(i, k, wallText);
+					CreateWall(i, k, wallText, *grid);
 				}
 				else {
-					CreateMunchie(i, k, munchieTexture, m);
+					CreateMunchie(i, k, munchieTexture, m, *grid);
 				}
 			}
 			else if (k == 17) {
 				if (i == 0 || (i >= 13 && i <= 15)) {
 
-					CreateWall(i, k, wallText);
+					CreateWall(i, k, wallText, *grid);
 				}
 				else {
-					CreateMunchie(i, k, munchieTexture, m);
+					CreateMunchie(i, k, munchieTexture, m, *grid);
 				}
 			}
 			else if (k == 18) {
 				if (i == 0 || (i >= 2 && i <= 6) || (i >= 8 && i <= 11)) {
 
-					CreateWall(i, k, wallText);
+					CreateWall(i, k, wallText, *grid);
 				}
 				else {
-					CreateMunchie(i, k, munchieTexture, m);
+					CreateMunchie(i, k, munchieTexture, m, *grid);
 				}
 			}
 			else if (k == 19) {
 				if (i == 0 || i == 2 || i == 4 || i == 6 || (i >= 8 && i <= 15)) {
 
-					CreateWall(i, k, wallText);
+					CreateWall(i, k, wallText, *grid);
 				}
 				else {
-					CreateMunchie(i, k, munchieTexture, m);
+					CreateMunchie(i, k, munchieTexture, m, *grid);
 				}
 			}
 			else if (k == 20) {
 				if (i == 0 || i == 2 || i == 4 || i == 6 || i == 15) {
 
-					CreateWall(i, k, wallText);
+					CreateWall(i, k, wallText, *grid);
 				}
 				else {
-					CreateMunchie(i, k, munchieTexture, m);
+					CreateMunchie(i, k, munchieTexture, m, *grid);
 				}
 			}
 			else if (k == 21) {
 				if (i == 0 || i == 2 || i == 4 || (i >= 6 && i <= 13) || i == 15) {
 
-					CreateWall(i, k, wallText);
+					CreateWall(i, k, wallText, *grid);
 				}
 				else {
-					CreateMunchie(i, k, munchieTexture, m);
+					CreateMunchie(i, k, munchieTexture, m, *grid);
 				}
 			}
 			else if (k == 22) {
 				if (i == 0 || i == 15) {
 
-					CreateWall(i, k, wallText);
+					CreateWall(i, k, wallText, *grid);
 				}
 				else {
-					CreateMunchie(i, k, munchieTexture, m);
+					CreateMunchie(i, k, munchieTexture, m, *grid);
 				}
 			}
 			else if (k == 23) {
 				if (i < 14) {
-					CreateWall(i, k, wallText);
+					CreateWall(i, k, wallText, *grid);
 				}
 				else {
-					CreateMunchie(i, k, munchieTexture, m);
+					CreateMunchie(i, k, munchieTexture, m, *grid);
 				}
 			}
 		}
 	}
 }
-void Grid::CreateMunchie(int i, int k, Texture2D* munchieTexture, int& m) {
+void Grid::CreateMunchie(int i, int k, Texture2D* munchieTexture, int& m, Grid& grid) {
 	//left side
 	_munchies[m] = new PickUp();
 	_munchies[m]->currentFrameTime = 0;
@@ -621,7 +622,9 @@ void Grid::CreateMunchie(int i, int k, Texture2D* munchieTexture, int& m) {
 	_munchies[m]->texture = munchieTexture;
 	_munchies[m]->rect = new Rect(11 + (32 * i), 10 + (32 * k), 12, 12);
 	_munchies[m]->sourceRect = new Rect(0.0f, 0.0f, 12, 12);
+	grid.empty[i][k] = true;
 	m++;
+	
 	//mirror image
 	_munchies[m] = new PickUp();
 	_munchies[m]->currentFrameTime = 0;
@@ -629,18 +632,20 @@ void Grid::CreateMunchie(int i, int k, Texture2D* munchieTexture, int& m) {
 	_munchies[m]->texture = munchieTexture;
 	_munchies[m]->rect = new Rect(11 + (32 * (31 - i)), 10 + (32 * k), 12, 12);
 	_munchies[m]->sourceRect = new Rect(0.0f, 0.0f, 12, 12);
+	grid.empty[31-i][k] = true;
 	m++;
 }
-void Grid::CreateWall(int i, int k, Texture2D* wallText) {
+void Grid::CreateWall(int i, int k, Texture2D* wallText, Grid& grid) {
 	//left side
 	Wall* nextWall = new Wall();
 	walls.push_back(nextWall);
 	nextWall->position = new Vector2(32 * i, 32 * k);
-	nextWall->texture = wallText;
-
+	nextWall->texture = wallText, grid;
+	grid.empty[i][k] = false;
 	//mirror image
 	Wall* nextWallMirror = new Wall();
 	walls.push_back(nextWallMirror);
 	nextWallMirror->position = new Vector2(32 * (31 - i), 32 * k);
-	nextWallMirror->texture = wallText;
+	nextWallMirror->texture = wallText, grid;
+	grid.empty[31 - i][k] = false;
 }

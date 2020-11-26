@@ -43,9 +43,11 @@ struct PickUp {
 };
 struct Enemy {
 	Vector2* position;
+	Vector2* gridPos;
 	Texture2D* texture;
 	Rect* sourceRect;
-	int direction;
+	int directionX;
+	int directionY;
 	const float speed = 0.15f;
 };
 struct Wall {
@@ -55,13 +57,14 @@ struct Wall {
 class Grid {
 	const int horizontalBlocks = 1024 / 32;
 	const int verticalBlocks = 768 / 32;
+	bool empty[1024 / 32][768 / 32];
 	const Vector2* origin = new Vector2(0, 0);
 public:
 	vector <Wall*> walls;
 	PickUp* _munchies[MUNCHIECOUNT];
-	void GenerateMap();
-	void CreateWall(int i, int k, Texture2D* wallText);
-	void CreateMunchie(int i, int k, Texture2D* munchieTexture, int& m);
+	void GenerateMap(Grid *grid);
+	void CreateWall(int i, int k, Texture2D* wallText, Grid& grid);
+	void CreateMunchie(int i, int k, Texture2D* munchieTexture, int& m, Grid& grid);
 };
 class Pacman : public Game
 {
@@ -109,9 +112,11 @@ private:
 	void UpdatePacman(int elapsedTime);
 	void UpdateMunchie(int elpsedTime);
 	//ghosts methods
-	void UpdateGhost(Enemy* ghost, int elapsedTime);
+	void UpdateGhost(Enemy* ghost, int elapsedTime,const Grid& grid);
+	void findGridPosition(const Vector2 &position, Vector2 &gridPos);
 	void CheckGhostCollisions();
 	void CheckWallCollisions();
+
 public:
 	/// <summary> Constructs the Pacman class. </summary>
 	Pacman(int argc, char* argv[]);

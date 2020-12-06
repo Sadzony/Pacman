@@ -76,6 +76,8 @@ private:
 	Grid* grid;
 	Player* _pacman;
 	bool gameOver = false;
+	int score = 0;
+	float fScore = 0.0f;
 	PickUp* _cherry;
 	Enemy* _ghosts[GHOSTCOUNT];
 	//start string data

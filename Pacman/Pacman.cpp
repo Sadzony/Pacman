@@ -112,12 +112,18 @@ void Pacman::Update(int elapsedTime)
 	Input::KeyboardState* keyboardState = Input::Keyboard::GetState();
 	//Get the mouse state
 	Input::MouseState* mouseState = Input::Mouse::GetState();
-
+	
 
 	CheckStarted(keyboardState, Input::Keys::SPACE);
 	if (_started) {
 		CheckPaused(keyboardState, Input::Keys::P);
 		if (!_paused) {
+			CheckMunchieCollisions();
+			fScore -= ((float)elapsedTime/500);
+			if (fScore < 0.0f) {
+				fScore = 0.0f;
+			}
+			score = (int)fScore;
 			Input(elapsedTime, keyboardState, mouseState);
 			UpdatePacman(elapsedTime);
 			CheckViewportColl();
@@ -185,6 +191,12 @@ void Pacman::Draw(int elapsedTime)
 	if (_started) {
 		for (int i = 0; i < grid->walls.size(); i++) {
 			SpriteBatch::Draw(grid->walls.at(i)->texture, grid->walls.at(i)->position);
+			std::stringstream livesStream;
+			livesStream << "LIVES: " + to_string(_pacman->lives);
+			std::stringstream scoreStream;
+			scoreStream << "SCORE: " + to_string(score);
+			SpriteBatch::DrawString(livesStream.str().c_str(), &Vector2(100, 755), Color::Green);
+			SpriteBatch::DrawString(scoreStream.str().c_str(), &Vector2(900, 755), Color::Green);
 		}
 	}
 	if (!_started) {
@@ -323,6 +335,7 @@ void Pacman::CheckMunchieCollisions()
 {
 	for (int i = 0; i < MUNCHIECOUNT; i++) {
 		if (CheckCollision(*_pacman->position, *_pacman->sourceRect, Vector2(grid->_munchies[i]->rect->X, grid->_munchies[i]->rect->Y), *grid->_munchies[i]->sourceRect)) {
+			fScore += 10.0f;
 			grid->_munchies[i]->rect->X = 2000.0f;
 		}
 	}
@@ -334,6 +347,9 @@ void Pacman::UpdatePacman(int elapsedTime) {
 		_pacman->position->Y = 32 * 18;
 		_pacman->dead = false;
 
+	}
+	if (_pacman->lives < 0) {
+		_pacman->lives = 0;
 	}
 	if (movingXPositive) {
 		_pacman->position->X += pacmanFinalSpeed * elapsedTime; //Moves Pacman across X axis
@@ -350,7 +366,6 @@ void Pacman::UpdatePacman(int elapsedTime) {
 }
 void Pacman::UpdateMunchie(int elapsedTime) {
 	if (!_paused) {
-		CheckMunchieCollisions();
 		for (int i = 0; i < MUNCHIECOUNT; i++) {
 			grid->_munchies[i]->currentFrameTime += elapsedTime;
 			if (grid->_munchies[i]->currentFrameTime > grid->_munchies[i]->frameTime) {

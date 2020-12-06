@@ -19,8 +19,7 @@ Pacman::Pacman(int argc, char* argv[]) : Game(argc, argv)
 	//initialise ghosts
 	for (int i = 0; i < GHOSTCOUNT; i++) {
 		_ghosts[i] = new Enemy();
-		_ghosts[i]->directionX = 0;
-		_ghosts[i]->directionY = 0;
+		_ghosts[i]->direction = 0;
 
 	}
 	_frameCount = 0;
@@ -64,6 +63,7 @@ Pacman::~Pacman()
 	delete _pacman->texture;
 	delete _pacman->sourceRect;
 	delete _pacman->position;
+	delete _pacman->gridPos;
 	delete _pacman;
 
 }
@@ -74,13 +74,14 @@ void Pacman::LoadContent()
 	_pacman->texture = new Texture2D();
 	_pacman->texture->Load("Textures/Pacman.tga", false);
 	_pacman->position = new Vector2(32 * 15, 32 * 18);
+	_pacman->gridPos = new Vector2(32 * 15, 32 * 18);
 	_pacman->sourceRect = new Rect(0.0f, 0.0f, 32, 32);
 	Texture2D* munchieTexture = new Texture2D();
 	//load ghosts
 	for (int i = 0; i < GHOSTCOUNT; i++) {
 		_ghosts[i]->texture = new Texture2D();
 		_ghosts[i]->texture->Load("Textures/GhostBlue.png", false);
-		_ghosts[i]->position = new Vector2((32*14)+(32*i), (32*11));
+		_ghosts[i]->position = new Vector2((32 * 14) + (32 * i), (32 * 11));
 		_ghosts[i]->gridPos = new Vector2(0, 0);
 		_ghosts[i]->sourceRect = new Rect(0.0f, 0.0f, 20, 20);
 	}
@@ -204,7 +205,11 @@ void Pacman::Input(int elapsedTime, Input::KeyboardState* keyboardState, Input::
 	}
 #pragma endregion
 #pragma region KeyboardInput
-	if (keyboardState->IsKeyDown(Input::Keys::D)) {
+	if (keyboardState->IsKeyUp(Input::Keys::D) && keyboardState->IsKeyUp(Input::Keys::A) && keyboardState->IsKeyUp(Input::Keys::W) && keyboardState->IsKeyUp(Input::Keys::S)) {
+		inputPressed = false;
+	}
+	if (keyboardState->IsKeyDown(Input::Keys::D) && inputPressed == false) {
+		inputPressed = true;
 		movingXPositive = true;
 		movingXNegative = false;
 		movingYPositive = false;
@@ -212,7 +217,8 @@ void Pacman::Input(int elapsedTime, Input::KeyboardState* keyboardState, Input::
 		_pacman->direction = 0;
 
 	}
-	if (keyboardState->IsKeyDown(Input::Keys::A)) {
+	else if (keyboardState->IsKeyDown(Input::Keys::A) && inputPressed == false) {
+		inputPressed = true;
 		movingXPositive = false;
 		movingXNegative = true;
 		movingYPositive = false;
@@ -220,7 +226,8 @@ void Pacman::Input(int elapsedTime, Input::KeyboardState* keyboardState, Input::
 		_pacman->direction = 2;
 	}
 
-	if (keyboardState->IsKeyDown(Input::Keys::W)) {
+	else if (keyboardState->IsKeyDown(Input::Keys::W) && inputPressed == false) {
+		inputPressed = true;
 		movingXPositive = false;
 		movingXNegative = false;
 		movingYPositive = true;
@@ -228,7 +235,8 @@ void Pacman::Input(int elapsedTime, Input::KeyboardState* keyboardState, Input::
 		_pacman->direction = 3;
 	}
 
-	if (keyboardState->IsKeyDown(Input::Keys::S)) {
+	else if (keyboardState->IsKeyDown(Input::Keys::S) && inputPressed == false) {
+		inputPressed = true;
 		movingXPositive = false;
 		movingXNegative = false;
 		movingYPositive = false;
@@ -286,13 +294,13 @@ void Pacman::CheckViewportColl() {
 	}
 
 }
-void Pacman::findGridPosition(const Vector2 &position, Vector2 &gridPos) {
+void Pacman::findGridPosition(const Vector2& position, Vector2* gridPos) {
 	float gridPosUnroundedX = position.X / 32;
-	float gridPosUnroundedY = position.Y / 24;
+	float gridPosUnroundedY = position.Y / 32;
 	int gridPosX = (int)(round(gridPosUnroundedX));
 	int gridPosY = (int)(round(gridPosUnroundedY));
-	gridPos.X = gridPosX;
-	gridPos.Y = gridPosY;
+	gridPos->X = gridPosX;
+	gridPos->Y = gridPosY;
 }
 void Pacman::UpdatePacman(int elapsedTime) {
 	float pacmanFinalSpeed = _pacman->speed * _pacman->speedMultiplier;
@@ -350,7 +358,241 @@ void Pacman::CheckGhostCollisions() {
 	}
 }
 void Pacman::UpdateGhost(Enemy* ghost, int elapsedTime, const Grid& grid) {
-	findGridPosition(*ghost->position, *ghost->gridPos);
+	Vector2 oldGridPos = *ghost->gridPos;
+	if (ghost->direction == 0) {
+		ghost->position->X += ghost->speed * elapsedTime;
+	}
+	else if (ghost->direction == 1) {
+		ghost->position->X -= ghost->speed * elapsedTime;
+	}
+	else if (ghost->direction == 2) {
+		ghost->position->Y -= ghost->speed * elapsedTime;
+	}
+	else if (ghost->direction == 3) {
+		ghost->position->Y += ghost->speed * elapsedTime;
+	}
+	findGridPosition(*ghost->position, ghost->gridPos);
+	Vector2 newGridPos = *ghost->gridPos;
+
+	if (oldGridPos.X <= newGridPos.X - 0.1f || oldGridPos.X >= newGridPos.X + 0.1f || oldGridPos.Y <= newGridPos.Y - 0.1f || oldGridPos.Y >= newGridPos.Y + 0.1f) {
+		int originalDir = ghost->direction;
+		if (ghost->direction == 0) {
+			bool right;
+			bool top;
+			bool bottom;
+			bool edge = false;
+			if ((int)round(ghost->gridPos->X) == 31) {
+				edge = true;
+				right = false;
+				top = grid.empty[(int)round(ghost->gridPos->X)][(int)round(ghost->gridPos->Y) - 1];
+				bottom = grid.empty[(int)round(ghost->gridPos->X)][(int)round(ghost->gridPos->Y) + 1];
+			}
+			if ((int)round(ghost->gridPos->Y) == 0) {
+				edge = true;
+				top = false;
+				bottom = grid.empty[(int)round(ghost->gridPos->X)][(int)round(ghost->gridPos->Y) + 1];
+				right = grid.empty[(int)round(ghost->gridPos->X) + 1][(int)round(ghost->gridPos->Y)];
+			}
+			if ((int)round(ghost->gridPos->Y) == 23) {
+				edge = true;
+				bottom = false;
+				right = grid.empty[(int)round(ghost->gridPos->X) + 1][(int)round(ghost->gridPos->Y)];
+				top = grid.empty[(int)round(ghost->gridPos->X)][(int)round(ghost->gridPos->Y) - 1];
+			}
+			if (!edge) {
+				right = grid.empty[(int)round(ghost->gridPos->X) + 1][(int)round(ghost->gridPos->Y)];
+				top = grid.empty[(int)round(ghost->gridPos->X)][(int)round(ghost->gridPos->Y) - 1];
+				bottom = grid.empty[(int)round(ghost->gridPos->X)][(int)round(ghost->gridPos->Y) + 1];
+			}
+			if (!right && !top && !bottom) {
+				ghost->direction = 1;
+			}
+			else {
+				bool possibleOutcomes[3] = { right,top,bottom };
+				vector<int> outcomePositions;
+				int chosenPosition;
+				for (int i = 0; i < 3; i++) {
+					if (possibleOutcomes[i] == true) {
+						outcomePositions.push_back(i);
+					}
+				}
+				int random = rand() % outcomePositions.size();
+				chosenPosition = outcomePositions.at(random);
+				if (chosenPosition == 0) {
+					ghost->direction = 0;
+				}
+				else if (chosenPosition == 1) {
+					ghost->direction = 2;
+				}
+				else if (chosenPosition == 2) {
+					ghost->direction = 3;
+				}
+			}
+		}
+		else if (ghost->direction == 1) {
+			bool left;
+			bool top;
+			bool bottom;
+			bool edge = false;
+			if ((int)round(ghost->gridPos->X) == 0) {
+				edge = true;
+				left = false;
+				top = grid.empty[(int)round(ghost->gridPos->X)][(int)round(ghost->gridPos->Y) - 1];
+				bottom = grid.empty[(int)round(ghost->gridPos->X)][(int)round(ghost->gridPos->Y) + 1];
+			}
+			if ((int)round(ghost->gridPos->Y) == 0) {
+				edge = true;
+				top = false;
+				bottom = grid.empty[(int)round(ghost->gridPos->X)][(int)round(ghost->gridPos->Y) + 1];
+				left = grid.empty[(int)round(ghost->gridPos->X) - 1][(int)round(ghost->gridPos->Y)];
+			}
+			if ((int)round(ghost->gridPos->Y) == 23) {
+				edge = true;
+				bottom = false;
+				left = grid.empty[(int)round(ghost->gridPos->X) - 1][(int)round(ghost->gridPos->Y)];
+				top = grid.empty[(int)round(ghost->gridPos->X)][(int)round(ghost->gridPos->Y) - 1];
+			}
+			if (!edge) {
+				left = grid.empty[(int)round(ghost->gridPos->X) - 1][(int)round(ghost->gridPos->Y)];
+				top = grid.empty[(int)round(ghost->gridPos->X)][(int)round(ghost->gridPos->Y) - 1];
+				bottom = grid.empty[(int)round(ghost->gridPos->X)][(int)round(ghost->gridPos->Y) + 1];
+			}
+			if (!left && !top && !bottom) {
+				ghost->direction = 0;
+			}
+			else {
+				bool possibleOutcomes[3] = { left,top,bottom };
+				vector<int> outcomePositions;
+				int chosenPosition;
+				for (int i = 0; i < 3; i++) {
+					if (possibleOutcomes[i] == true) {
+						outcomePositions.push_back(i);
+					}
+				}
+				int random = rand() % outcomePositions.size();
+				chosenPosition = outcomePositions.at(random);
+				if (chosenPosition == 0) {
+					ghost->direction = 1;
+				}
+				else if (chosenPosition == 1) {
+					ghost->direction = 2;
+				}
+				else if (chosenPosition == 2) {
+					ghost->direction = 3;
+				}
+			}
+		}
+		else if (ghost->direction == 2) {
+			bool left;
+			bool top;
+			bool right;
+			bool edge = false;
+			if ((int)round(ghost->gridPos->Y) == 0) {
+				edge = true;
+				top = false;
+				left = grid.empty[(int)round(ghost->gridPos->X) - 1][(int)round(ghost->gridPos->Y)];
+				right = grid.empty[(int)round(ghost->gridPos->X) + 1][(int)round(ghost->gridPos->Y)];
+			}
+			if ((int)round(ghost->gridPos->X) == 0) {
+				edge = true;
+				left = false;
+				right = grid.empty[(int)round(ghost->gridPos->X) + 1][(int)round(ghost->gridPos->Y)];
+				top = grid.empty[(int)round(ghost->gridPos->X)][(int)round(ghost->gridPos->Y) - 1];
+			}
+			if ((int)round(ghost->gridPos->X) == 31) {
+				edge = true;
+				right = false;
+				left = grid.empty[(int)round(ghost->gridPos->X) - 1][(int)round(ghost->gridPos->Y)];
+				top = grid.empty[(int)round(ghost->gridPos->X)][(int)round(ghost->gridPos->Y) - 1];
+			}
+			if (!edge) {
+				left = grid.empty[(int)round(ghost->gridPos->X) - 1][(int)round(ghost->gridPos->Y)];
+				top = grid.empty[(int)round(ghost->gridPos->X)][(int)round(ghost->gridPos->Y) - 1];
+				right = grid.empty[(int)round(ghost->gridPos->X) + 1][(int)round(ghost->gridPos->Y)];
+			}
+			if (!left && !top && !right) {
+				ghost->direction = 3;
+			}
+			else {
+				bool possibleOutcomes[3] = { left,top,right };
+				vector<int> outcomePositions;
+				int chosenPosition;
+				for (int i = 0; i < 3; i++) {
+					if (possibleOutcomes[i] == true) {
+						outcomePositions.push_back(i);
+					}
+				}
+				int random = rand() % outcomePositions.size();
+				chosenPosition = outcomePositions.at(random);
+				if (chosenPosition == 0) {
+					ghost->direction = 1;
+				}
+				else if (chosenPosition == 1) {
+					ghost->direction = 2;
+				}
+				else if (chosenPosition == 2) {
+					ghost->direction = 0;
+				}
+			}
+
+		}
+		else if (ghost->direction == 3) {
+			bool left;
+			bool bottom;
+			bool right;
+			bool edge = false;
+			if ((int)round(ghost->gridPos->Y) == 23) {
+				edge = true;
+				bottom = false;
+				left = grid.empty[(int)round(ghost->gridPos->X) - 1][(int)round(ghost->gridPos->Y)];
+				right = grid.empty[(int)round(ghost->gridPos->X) + 1][(int)round(ghost->gridPos->Y)];
+			}
+			if ((int)round(ghost->gridPos->X) == 0) {
+				edge = true;
+				left = false;
+				right = grid.empty[(int)round(ghost->gridPos->X) + 1][(int)round(ghost->gridPos->Y)];
+				bottom = grid.empty[(int)round(ghost->gridPos->X)][(int)round(ghost->gridPos->Y) + 1];
+			}
+			if ((int)round(ghost->gridPos->X) == 31) {
+				edge = true;
+				right = false;
+				left = grid.empty[(int)round(ghost->gridPos->X) - 1][(int)round(ghost->gridPos->Y)];
+				bottom = grid.empty[(int)round(ghost->gridPos->X)][(int)round(ghost->gridPos->Y) + 1];
+			}
+			if (!edge) {
+				left = grid.empty[(int)round(ghost->gridPos->X) - 1][(int)round(ghost->gridPos->Y)];
+				bottom = grid.empty[(int)round(ghost->gridPos->X)][(int)round(ghost->gridPos->Y) + 1];
+				right = grid.empty[(int)round(ghost->gridPos->X) + 1][(int)round(ghost->gridPos->Y)];
+			}
+			if (!left && !bottom && !right) {
+				ghost->direction = 2;
+			}
+			else {
+				bool possibleOutcomes[3] = { left,bottom,right };
+				vector<int> outcomePositions;
+				int chosenPosition;
+				for (int i = 0; i < 3; i++) {
+					if (possibleOutcomes[i] == true) {
+						outcomePositions.push_back(i);
+					}
+				}
+				int random = rand() % outcomePositions.size();
+				chosenPosition = outcomePositions.at(random);
+				if (chosenPosition == 0) {
+					ghost->direction = 1;
+				}
+				else if (chosenPosition == 1) {
+					ghost->direction = 3;
+				}
+				else if (chosenPosition == 2) {
+					ghost->direction = 0;
+				}
+			}
+		}
+		if (ghost->direction != originalDir) {
+			SnapToGrid(ghost->position, ghost->gridPos);
+		}
+	}
 
 }
 void Pacman::CheckWallCollisions() {
@@ -373,13 +615,13 @@ void Pacman::CheckWallCollisions() {
 				//update to the right
 				_pacman->position->X = right2;
 			}
-			else  if (right1 > left2 && left1 <left2) {
+			else  if (right1 > left2 && left1 < left2) {
 				//update to the left
-				_pacman->position->X = left2-32;
+				_pacman->position->X = left2 - 32;
 			}
 			if (bottom1 > top2 && top1 < top2) {
 				//update to the top
-				_pacman->position->Y = top2-32;
+				_pacman->position->Y = top2 - 32;
 			}
 			else if (top1 < bottom2 && bottom1 > bottom2) {
 				//update to the bottom
@@ -387,9 +629,9 @@ void Pacman::CheckWallCollisions() {
 			}
 		}
 
-	}	
+	}
 }
-void Grid::GenerateMap(Grid *grid) {
+void Grid::GenerateMap(Grid* grid) {
 	Texture2D* wallText = new Texture2D();
 	Texture2D* munchieTexture = new Texture2D();
 	int m = 0;
@@ -624,7 +866,7 @@ void Grid::CreateMunchie(int i, int k, Texture2D* munchieTexture, int& m, Grid& 
 	_munchies[m]->sourceRect = new Rect(0.0f, 0.0f, 12, 12);
 	grid.empty[i][k] = true;
 	m++;
-	
+
 	//mirror image
 	_munchies[m] = new PickUp();
 	_munchies[m]->currentFrameTime = 0;
@@ -632,7 +874,7 @@ void Grid::CreateMunchie(int i, int k, Texture2D* munchieTexture, int& m, Grid& 
 	_munchies[m]->texture = munchieTexture;
 	_munchies[m]->rect = new Rect(11 + (32 * (31 - i)), 10 + (32 * k), 12, 12);
 	_munchies[m]->sourceRect = new Rect(0.0f, 0.0f, 12, 12);
-	grid.empty[31-i][k] = true;
+	grid.empty[31 - i][k] = true;
 	m++;
 }
 void Grid::CreateWall(int i, int k, Texture2D* wallText, Grid& grid) {
@@ -648,4 +890,13 @@ void Grid::CreateWall(int i, int k, Texture2D* wallText, Grid& grid) {
 	nextWallMirror->position = new Vector2(32 * (31 - i), 32 * k);
 	nextWallMirror->texture = wallText, grid;
 	grid.empty[31 - i][k] = false;
+}
+
+void Pacman::SnapToGrid(Vector2* position, const Vector2* gridPos)
+{
+	Vector2 newPos;
+	newPos.X = gridPos->X * 32;
+	newPos.Y = gridPos->Y * 32;
+	position->X = newPos.X;
+	position->Y = newPos.Y;
 }

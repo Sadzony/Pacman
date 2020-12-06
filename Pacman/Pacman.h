@@ -23,6 +23,7 @@ using namespace S2D;
 struct Player {
 	bool dead;
 	Vector2* position;
+	Vector2* gridPos;
 	Rect* sourceRect;
 	Texture2D* texture;
 	const float speed = 0.15f;
@@ -31,6 +32,7 @@ struct Player {
 	int frame;
 	int currentFrameTime;
 	const int frameTime = 250;
+	
 
 };
 struct PickUp {
@@ -46,9 +48,9 @@ struct Enemy {
 	Vector2* gridPos;
 	Texture2D* texture;
 	Rect* sourceRect;
-	int directionX;
-	int directionY;
-	const float speed = 0.15f;
+	int direction;
+	const float speed = 0.25f;
+
 };
 struct Wall {
 	Vector2* position;
@@ -57,9 +59,9 @@ struct Wall {
 class Grid {
 	const int horizontalBlocks = 1024 / 32;
 	const int verticalBlocks = 768 / 32;
-	bool empty[1024 / 32][768 / 32];
-	const Vector2* origin = new Vector2(0, 0);
+	const Vector2* origin = new Vector2(0, 0);	
 public:
+	bool empty[1024 / 32][768 / 32];
 	vector <Wall*> walls;
 	PickUp* _munchies[MUNCHIECOUNT];
 	void GenerateMap(Grid *grid);
@@ -82,6 +84,7 @@ private:
 	//const data
 
 	//moving bools
+	bool inputPressed = false;
 	bool movingXPositive;
 	bool movingYPositive;
 	bool movingXNegative;
@@ -113,10 +116,10 @@ private:
 	void UpdateMunchie(int elpsedTime);
 	//ghosts methods
 	void UpdateGhost(Enemy* ghost, int elapsedTime,const Grid& grid);
-	void findGridPosition(const Vector2 &position, Vector2 &gridPos);
+	void findGridPosition(const Vector2 &position, Vector2 *gridPos);
 	void CheckGhostCollisions();
 	void CheckWallCollisions();
-
+	void SnapToGrid(Vector2 *position,const Vector2 *gridPos);
 public:
 	/// <summary> Constructs the Pacman class. </summary>
 	Pacman(int argc, char* argv[]);

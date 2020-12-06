@@ -302,8 +302,39 @@ void Pacman::findGridPosition(const Vector2& position, Vector2* gridPos) {
 	gridPos->X = gridPosX;
 	gridPos->Y = gridPosY;
 }
+bool Pacman::CheckCollision(const Vector2& position1, const Rect& sourceRect1, const Vector2& position2, const Rect& sourceRect2)
+{
+	int bottom1 = position1.Y + sourceRect1.Height;
+	int bottom2 = position2.Y + sourceRect2.Height;
+	int left1 = position1.X;
+	int left2 = position2.X;
+	int right1 = position1.X + sourceRect1.Width;
+	int right2 = position2.X + sourceRect2.Width;
+	int top1 = position1.Y;
+	int top2 = position2.Y;
+	if (bottom1 > top2 && top1<bottom2 && right1 >left2 && left1 < right2) {
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+void Pacman::CheckMunchieCollisions()
+{
+	for (int i = 0; i < MUNCHIECOUNT; i++) {
+		if (CheckCollision(*_pacman->position, *_pacman->sourceRect, Vector2(grid->_munchies[i]->rect->X, grid->_munchies[i]->rect->Y), *grid->_munchies[i]->sourceRect)) {
+			grid->_munchies[i]->rect->X = 2000.0f;
+		}
+	}
+}
 void Pacman::UpdatePacman(int elapsedTime) {
 	float pacmanFinalSpeed = _pacman->speed * _pacman->speedMultiplier;
+	if (_pacman->lives > 0 && _pacman->dead == true) {
+		_pacman->position->X = 32 * 15;
+		_pacman->position->Y = 32 * 18;
+		_pacman->dead = false;
+
+	}
 	if (movingXPositive) {
 		_pacman->position->X += pacmanFinalSpeed * elapsedTime; //Moves Pacman across X axis
 	}
@@ -319,6 +350,7 @@ void Pacman::UpdatePacman(int elapsedTime) {
 }
 void Pacman::UpdateMunchie(int elapsedTime) {
 	if (!_paused) {
+		CheckMunchieCollisions();
 		for (int i = 0; i < MUNCHIECOUNT; i++) {
 			grid->_munchies[i]->currentFrameTime += elapsedTime;
 			if (grid->_munchies[i]->currentFrameTime > grid->_munchies[i]->frameTime) {
@@ -337,21 +369,9 @@ void Pacman::UpdateMunchie(int elapsedTime) {
 	}
 }
 void Pacman::CheckGhostCollisions() {
-	int i = 0;
-	int bottom1 = _pacman->position->Y + _pacman->sourceRect->Height;
-	int bottom2 = 0;
-	int left1 = _pacman->position->X;
-	int left2 = 0;
-	int right1 = _pacman->position->X + _pacman->sourceRect->Width;
-	int right2 = 0;
-	int top1 = _pacman->position->Y;
-	int top2 = 0;
-	for (i = 0; i < GHOSTCOUNT; i++) {
-		bottom2 = _ghosts[i]->position->Y + _ghosts[i]->sourceRect->Height;
-		left2 = _ghosts[i]->position->X;
-		right2 = _ghosts[i]->position->X + _ghosts[i]->sourceRect->Width;
-		top2 = _ghosts[i]->position->Y;
-		if (bottom1 > top2 && top1<bottom2 && right1 >left2 && left1 < right2) {
+	for (int i = 0; i < GHOSTCOUNT; i++) {
+		if (CheckCollision(*_pacman->position, *_pacman->sourceRect, *_ghosts[i]->position, *_ghosts[i]->sourceRect)){
+			_pacman->lives--;
 			_pacman->dead = true;
 			i = GHOSTCOUNT;
 		}
@@ -863,6 +883,7 @@ void Grid::CreateMunchie(int i, int k, Texture2D* munchieTexture, int& m, Grid& 
 	_munchies[m]->frameTime = rand() % 500 + 50;
 	_munchies[m]->texture = munchieTexture;
 	_munchies[m]->rect = new Rect(11 + (32 * i), 10 + (32 * k), 12, 12);
+	_munchies[m]->originalRect =*_munchies[m]->rect;
 	_munchies[m]->sourceRect = new Rect(0.0f, 0.0f, 12, 12);
 	grid.empty[i][k] = true;
 	m++;
@@ -873,6 +894,7 @@ void Grid::CreateMunchie(int i, int k, Texture2D* munchieTexture, int& m, Grid& 
 	_munchies[m]->frameTime = rand() % 500 + 50;
 	_munchies[m]->texture = munchieTexture;
 	_munchies[m]->rect = new Rect(11 + (32 * (31 - i)), 10 + (32 * k), 12, 12);
+	_munchies[m]->originalRect = *_munchies[m]->rect;
 	_munchies[m]->sourceRect = new Rect(0.0f, 0.0f, 12, 12);
 	grid.empty[31 - i][k] = true;
 	m++;

@@ -21,6 +21,7 @@ using namespace S2D;
 // This allows us to overload the Game class methods to help us
 // load content, draw and update our game.
 struct Player {
+	int lives = 3;
 	bool dead;
 	Vector2* position;
 	Vector2* gridPos;
@@ -37,6 +38,7 @@ struct Player {
 };
 struct PickUp {
 	Rect* rect;
+	Rect originalRect;
 	Rect* sourceRect;
 	int frameTime = 500;
 	int currentFrameTime;
@@ -49,7 +51,7 @@ struct Enemy {
 	Texture2D* texture;
 	Rect* sourceRect;
 	int direction;
-	const float speed = 0.25f;
+	const float speed = 0.18f;
 
 };
 struct Wall {
@@ -73,6 +75,7 @@ class Pacman : public Game
 private:
 	Grid* grid;
 	Player* _pacman;
+	bool gameOver = false;
 	PickUp* _cherry;
 	Enemy* _ghosts[GHOSTCOUNT];
 	//start string data
@@ -117,6 +120,8 @@ private:
 	//ghosts methods
 	void UpdateGhost(Enemy* ghost, int elapsedTime,const Grid& grid);
 	void findGridPosition(const Vector2 &position, Vector2 *gridPos);
+	bool CheckCollision(const Vector2& position1, const Rect& sourceRect1, const Vector2& position2, const Rect& sourceRect2);
+	void CheckMunchieCollisions();
 	void CheckGhostCollisions();
 	void CheckWallCollisions();
 	void SnapToGrid(Vector2 *position,const Vector2 *gridPos);

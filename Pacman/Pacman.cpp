@@ -5,6 +5,8 @@ Pacman::Pacman(int argc, char* argv[]) : Game(argc, argv)
 {
 	grid = new Grid();
 	_pacman = new Player();
+	_pop = new SoundEffect();
+	deathSound = new SoundEffect();
 	_pacman->direction = 0;
 	_pacman->frame = 0;
 	_pacman->currentFrameTime = 0;
@@ -64,7 +66,8 @@ Pacman::~Pacman()
 	delete _gameOverRect;
 	delete winBG;
 	delete winRect;
-
+	delete _pop;
+	delete deathSound;
 }
 
 void Pacman::LoadContent()
@@ -105,6 +108,8 @@ void Pacman::LoadContent()
 	winBG = new Texture2D();
 	winBG->Load("Textures/win.png", false);
 	winRect = new Rect(0.0f, 0.0f, Graphics::GetViewportWidth(), Graphics::GetViewportHeight());
+	_pop->Load("Sounds/pop.wav");
+	deathSound->Load("Sounds/pacman_death.wav");
 }
 
 void Pacman::Update(int elapsedTime)
@@ -332,6 +337,7 @@ void Pacman::CheckMunchieCollisions()
 {
 	for (int i = 0; i < MUNCHIECOUNT; i++) {
 		if (CheckCollision(*_pacman->position, *_pacman->sourceRect, Vector2(grid->_munchies[i]->rect->X, grid->_munchies[i]->rect->Y), *grid->_munchies[i]->sourceRect)) {
+			Audio::Play(_pop);
 			fScore += 10.0f;
 			collectedMunchies++;
 			grid->_munchies[i]->rect->X = 2000.0f;
@@ -385,6 +391,7 @@ void Pacman::UpdateMunchie(int elapsedTime) {
 void Pacman::CheckGhostCollisions() {
 	for (int i = 0; i < GHOSTCOUNT; i++) {
 		if (CheckCollision(*_pacman->position, *_pacman->sourceRect, *_ghosts[i]->position, *_ghosts[i]->sourceRect)) {
+			Audio::Play(deathSound);
 			_pacman->lives--;
 			_pacman->dead = true;
 			i = GHOSTCOUNT;

@@ -109,7 +109,8 @@ private:
 	Texture2D* winBG;
 	Rect* winRect;
 	bool win = false;
-
+	SoundEffect* _pop;
+	SoundEffect* deathSound;
 	//Data for pacman animation
 
 	//pacman methods

@@ -10,52 +10,65 @@ D:\Visual Studio Community 2019\VC\Tools\MSVC\14.28.29333\include\vector(1750): 
               _Ty=S2D::Input::Keys
           ]
 D:\Programming\FOGGS\Pacman\Pacman\S2D\Input.h(108): message : see reference to class template instantiation 'std::vector<S2D::Input::Keys,std::allocator<S2D::Input::Keys>>' being compiled
-D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(12,12): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(34,20): warning C4018: '<': signed/unsigned mismatch
-D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(45,24): warning C4156: deletion of an array expression without using the array form of 'delete'; array form substituted
-D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(45,24): warning C4154: deletion of an array expression; conversion to pointer supplied
-D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(53,16): warning C4156: deletion of an array expression without using the array form of 'delete'; array form substituted
-D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(53,16): warning C4154: deletion of an array expression; conversion to pointer supplied
-D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(82,48): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(169,56): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(170,55): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(186,21): warning C4018: '<': signed/unsigned mismatch
-D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(292,28): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(295,52): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(14,12): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(37,20): warning C4018: '<': signed/unsigned mismatch
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(48,24): warning C4156: deletion of an array expression without using the array form of 'delete'; array form substituted
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(48,24): warning C4154: deletion of an array expression; conversion to pointer supplied
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(56,16): warning C4156: deletion of an array expression without using the array form of 'delete'; array form substituted
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(56,16): warning C4154: deletion of an array expression; conversion to pointer supplied
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(86,48): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(175,56): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(176,55): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(192,21): warning C4018: '<': signed/unsigned mismatch
 D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(298,28): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(301,53): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(310,15): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(311,15): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(315,14): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
-D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(316,14): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
-D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(317,12): warning C4244: 'initializing': conversion from 'const float' to 'int', possible loss of data
-D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(318,12): warning C4244: 'initializing': conversion from 'const float' to 'int', possible loss of data
-D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(319,13): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
-D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(320,13): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
-D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(321,11): warning C4244: 'initializing': conversion from 'const float' to 'int', possible loss of data
-D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(322,11): warning C4244: 'initializing': conversion from 'const float' to 'int', possible loss of data
-D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(376,70): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(377,78): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(633,14): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
-D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(635,12): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
-D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(637,13): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
-D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(639,11): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
-D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(641,16): warning C4018: '<': signed/unsigned mismatch
-D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(642,44): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
-D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(643,38): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
-D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(644,43): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
-D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(645,37): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
-D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(649,28): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(653,34): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(657,33): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(661,28): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(898,50): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(898,35): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(909,57): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(909,35): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(919,46): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(919,38): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(925,59): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(925,44): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(945,48): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(301,52): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(304,28): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(307,53): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(316,15): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(317,15): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(321,14): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(322,14): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(323,12): warning C4244: 'initializing': conversion from 'const float' to 'int', possible loss of data
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(324,12): warning C4244: 'initializing': conversion from 'const float' to 'int', possible loss of data
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(325,13): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(326,13): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(327,11): warning C4244: 'initializing': conversion from 'const float' to 'int', possible loss of data
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(328,11): warning C4244: 'initializing': conversion from 'const float' to 'int', possible loss of data
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(383,70): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(384,78): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(641,14): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(643,12): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(645,13): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(647,11): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(649,16): warning C4018: '<': signed/unsigned mismatch
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(650,44): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(651,38): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(652,43): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(653,37): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(657,28): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(661,34): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(665,33): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(669,28): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(906,50): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(906,35): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(917,57): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(917,35): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(927,46): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(927,38): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(933,59): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(933,44): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+D:\Programming\FOGGS\Pacman\Pacman\Pacman.cpp(953,48): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+  main.cpp
+D:\Visual Studio Community 2019\VC\Tools\MSVC\14.28.29333\include\vector(1750,1): warning C4251: 'std::vector<S2D::Input::Keys,std::allocator<S2D::Input::Keys>>::_Mypair': class 'std::_Compressed_pair<std::allocator<S2D::Input::Keys>,std::_Vector_val<std::_Simple_types<_Ty>>,true>' needs to have dll-interface to be used by clients of class 'std::vector<S2D::Input::Keys,std::allocator<S2D::Input::Keys>>'
+          with
+          [
+              _Ty=S2D::Input::Keys
+          ]
+D:\Visual Studio Community 2019\VC\Tools\MSVC\14.28.29333\include\vector(1750): message : see declaration of 'std::_Compressed_pair<std::allocator<S2D::Input::Keys>,std::_Vector_val<std::_Simple_types<_Ty>>,true>'
+          with
+          [
+              _Ty=S2D::Input::Keys
+          ]
+D:\Programming\FOGGS\Pacman\Pacman\S2D\Input.h(108): message : see reference to class template instantiation 'std::vector<S2D::Input::Keys,std::allocator<S2D::Input::Keys>>' being compiled
+  Generating Code...
   Pacman.vcxproj -> D:\Programming\FOGGS\Pacman\Debug\Pacman.exe

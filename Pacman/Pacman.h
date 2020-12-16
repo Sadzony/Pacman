@@ -76,9 +76,9 @@ private:
 	Grid* grid;
 	Player* _pacman;
 	bool gameOver = false;
+	int collectedMunchies = 0;
 	int score = 0;
 	float fScore = 0.0f;
-	PickUp* _cherry;
 	Enemy* _ghosts[GHOSTCOUNT];
 	//start string data
 	int _frameCount;
@@ -94,7 +94,6 @@ private:
 	bool movingYPositive;
 	bool movingXNegative;
 	bool movingYNegative;
-	bool cherryChangedPosition;
 	// Data for Menu
 	Texture2D* _menuBackground;
 	Rect* _menuRectangle;
@@ -105,6 +104,11 @@ private:
 	Texture2D* _startBG;
 	Rect* _startRect;
 	bool _started;
+	Texture2D* gameOverBG;
+	Rect* _gameOverRect;
+	Texture2D* winBG;
+	Rect* winRect;
+	bool win = false;
 
 	//Data for pacman animation
 
@@ -127,6 +131,7 @@ private:
 	void CheckGhostCollisions();
 	void CheckWallCollisions();
 	void SnapToGrid(Vector2 *position,const Vector2 *gridPos);
+	void RestartLevel();
 public:
 	/// <summary> Constructs the Pacman class. </summary>
 	Pacman(int argc, char* argv[]);

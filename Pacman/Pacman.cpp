@@ -9,11 +9,6 @@ Pacman::Pacman(int argc, char* argv[]) : Game(argc, argv)
 	_pacman->frame = 0;
 	_pacman->currentFrameTime = 0;
 	_pacman->speedMultiplier = 1.0f;
-	_pacman->dead = false;
-	cherryChangedPosition = false;
-	_cherry = new PickUp();
-	_cherry->frameCount = 0;
-	_cherry->currentFrameTime = 0;
 	srand(time(NULL));
 	//initialise munchies
 	//initialise ghosts
@@ -27,6 +22,7 @@ Pacman::Pacman(int argc, char* argv[]) : Game(argc, argv)
 	_paused = false;
 	_pKeyDown = false;
 	//Initialise important Game aspects
+	Audio::Initialise();
 	Graphics::Initialise(argc, argv, this, 1024, 768, false, 25, 25, "Pacman", 60);
 	Input::Initialise();
 
@@ -36,9 +32,6 @@ Pacman::Pacman(int argc, char* argv[]) : Game(argc, argv)
 
 Pacman::~Pacman()
 {
-	delete _cherry->texture;
-	delete _cherry->sourceRect;
-	delete _cherry->rect;
 	for (int i = 0; i < grid->walls.size(); i++) {
 		delete grid->walls.at(i)->position;
 		delete grid->walls.at(i)->texture;
@@ -65,6 +58,12 @@ Pacman::~Pacman()
 	delete _pacman->position;
 	delete _pacman->gridPos;
 	delete _pacman;
+	delete _startBG;
+	delete _startRect;
+	delete gameOverBG;
+	delete _gameOverRect;
+	delete winBG;
+	delete winRect;
 
 }
 
@@ -85,11 +84,7 @@ void Pacman::LoadContent()
 		_ghosts[i]->gridPos = new Vector2(0, 0);
 		_ghosts[i]->sourceRect = new Rect(0.0f, 0.0f, 20, 20);
 	}
-	//Load Cherry
-	_cherry->texture = new Texture2D();
-	_cherry->texture->Load("Textures/Cherry.png", true);
-	_cherry->rect = new Rect(200.0f, 450.0f, 32, 32);
-	_cherry->sourceRect = new Rect(0.0f, 0.0f, 32, 32);
+
 	//Load Grid
 	grid->GenerateMap(grid);
 	// Set string position
@@ -104,6 +99,12 @@ void Pacman::LoadContent()
 	_startBG->Load("Textures/PacmanStartScreen.png", false);
 	_startRect = new Rect(0.0f, 0.0f, Graphics::GetViewportWidth(), Graphics::GetViewportHeight());
 	_startStringPosition = new Vector2((Graphics::GetViewportWidth() / 2.0f) - 80.0f, (Graphics::GetViewportHeight() / 1.25f));
+	gameOverBG = new Texture2D();
+	gameOverBG->Load("Textures/gameover.png", false);
+	_gameOverRect = new Rect(0.0f, 0.0f, Graphics::GetViewportWidth(), Graphics::GetViewportHeight());
+	winBG = new Texture2D();
+	winBG->Load("Textures/win.png", false);
+	winRect = new Rect(0.0f, 0.0f, Graphics::GetViewportWidth(), Graphics::GetViewportHeight());
 }
 
 void Pacman::Update(int elapsedTime)
@@ -112,26 +113,34 @@ void Pacman::Update(int elapsedTime)
 	Input::KeyboardState* keyboardState = Input::Keyboard::GetState();
 	//Get the mouse state
 	Input::MouseState* mouseState = Input::Mouse::GetState();
-	
+
 
 	CheckStarted(keyboardState, Input::Keys::SPACE);
-	if (_started) {
+	if (win || gameOver) {
+		if (keyboardState->IsKeyDown(Input::Keys::SPACE)) {
+			RestartLevel();
+		}
+	}
+	if (_started && !gameOver && !win) {
 		CheckPaused(keyboardState, Input::Keys::P);
 		if (!_paused) {
 			CheckMunchieCollisions();
-			fScore -= ((float)elapsedTime/500);
+			fScore -= ((float)elapsedTime / 500);
 			if (fScore < 0.0f) {
 				fScore = 0.0f;
 			}
 			score = (int)fScore;
-			Input(elapsedTime, keyboardState, mouseState);
 			UpdatePacman(elapsedTime);
+			Input(elapsedTime, keyboardState, mouseState);
 			CheckViewportColl();
 			CheckWallCollisions();
 			for (int i = 0; i < GHOSTCOUNT; i++) {
 				UpdateGhost(_ghosts[i], elapsedTime, *grid);
 			}
 			CheckGhostCollisions();
+			if (collectedMunchies >= MUNCHIECOUNT) {
+				win = true;
+			}
 		}
 
 	}
@@ -148,20 +157,6 @@ void Pacman::Draw(int elapsedTime)
 	SpriteBatch::BeginDraw(); // Starts Drawing
 
 
-	//draws cherry
-	if (!_paused) {
-		_cherry->currentFrameTime += elapsedTime;
-		if (_cherry->currentFrameTime > _cherry->frameTime) {
-			_cherry->frameCount++;
-			if (_cherry->frameCount >= 2) {
-				_cherry->frameCount = 0;
-			}
-			_cherry->currentFrameTime = 0;
-		}
-		_cherry->sourceRect->Y = _cherry->sourceRect->Height;
-		_cherry->sourceRect->X = _cherry->sourceRect->Width * _cherry->frameCount;
-	}
-	SpriteBatch::Draw(_cherry->texture, _cherry->rect, _cherry->sourceRect);
 	// Draws Pacman
 	_pacman->currentFrameTime += elapsedTime;
 	if (!_paused) {
@@ -188,7 +183,7 @@ void Pacman::Draw(int elapsedTime)
 		SpriteBatch::Draw(_menuBackground, _menuRectangle, nullptr);
 		SpriteBatch::DrawString(menuStream.str().c_str(), _menuStringPosition, Color::Red);
 	}
-	if (_started) {
+	if (_started && !gameOver && !win) {
 		for (int i = 0; i < grid->walls.size(); i++) {
 			SpriteBatch::Draw(grid->walls.at(i)->texture, grid->walls.at(i)->position);
 			std::stringstream livesStream;
@@ -198,6 +193,24 @@ void Pacman::Draw(int elapsedTime)
 			SpriteBatch::DrawString(livesStream.str().c_str(), &Vector2(100, 755), Color::Green);
 			SpriteBatch::DrawString(scoreStream.str().c_str(), &Vector2(900, 755), Color::Green);
 		}
+	}
+	std::stringstream restartStream;
+	std::stringstream finalScoreStream;
+	finalScoreStream << "Your final score was: " + to_string(score);
+	restartStream << "Press space to restart.";
+	if (gameOver) {
+		SpriteBatch::Draw(gameOverBG, _gameOverRect, nullptr);
+		if (_frameCount < 30) {
+			SpriteBatch::DrawString(restartStream.str().c_str(), _startStringPosition, Color::White);
+		}
+		SpriteBatch::DrawString(finalScoreStream.str().c_str(), &Vector2(432, 755), Color::White);
+	}
+	if (win) {
+		SpriteBatch::Draw(winBG, winRect, nullptr);
+		if (_frameCount < 30) {
+			SpriteBatch::DrawString(restartStream.str().c_str(), _startStringPosition, Color::White);
+		}
+		SpriteBatch::DrawString(finalScoreStream.str().c_str(), &Vector2(432, 755), Color::White);
 	}
 	if (!_started) {
 		std::stringstream startStream;
@@ -210,12 +223,6 @@ void Pacman::Draw(int elapsedTime)
 	SpriteBatch::EndDraw(); // Ends Drawing
 }
 void Pacman::Input(int elapsedTime, Input::KeyboardState* keyboardState, Input::MouseState* mouseState) {
-#pragma region MouseInput
-	if (mouseState->LeftButton == Input::ButtonState::PRESSED) {
-		_cherry->rect->X = mouseState->X;
-		_cherry->rect->Y = mouseState->Y;
-	}
-#pragma endregion
 #pragma region KeyboardInput
 	if (keyboardState->IsKeyUp(Input::Keys::D) && keyboardState->IsKeyUp(Input::Keys::A) && keyboardState->IsKeyUp(Input::Keys::W) && keyboardState->IsKeyUp(Input::Keys::S)) {
 		inputPressed = false;
@@ -263,16 +270,6 @@ void Pacman::Input(int elapsedTime, Input::KeyboardState* keyboardState, Input::
 	}
 	else {
 		_pacman->speedMultiplier = 1.0f;
-	}
-#pragma endregion
-#pragma region RandomizeCherryPos
-	if (keyboardState->IsKeyDown(Input::Keys::R) && cherryChangedPosition == false) {
-		_cherry->rect->X = rand() % Graphics::GetViewportWidth();
-		_cherry->rect->Y = rand() % Graphics::GetViewportHeight();
-		cherryChangedPosition = true;
-	}
-	else if (keyboardState->IsKeyUp(Input::Keys::R)) {
-		cherryChangedPosition = false;
 	}
 #pragma endregion
 
@@ -336,6 +333,7 @@ void Pacman::CheckMunchieCollisions()
 	for (int i = 0; i < MUNCHIECOUNT; i++) {
 		if (CheckCollision(*_pacman->position, *_pacman->sourceRect, Vector2(grid->_munchies[i]->rect->X, grid->_munchies[i]->rect->Y), *grid->_munchies[i]->sourceRect)) {
 			fScore += 10.0f;
+			collectedMunchies++;
 			grid->_munchies[i]->rect->X = 2000.0f;
 		}
 	}
@@ -350,6 +348,7 @@ void Pacman::UpdatePacman(int elapsedTime) {
 	}
 	if (_pacman->lives < 0) {
 		_pacman->lives = 0;
+		gameOver = true;
 	}
 	if (movingXPositive) {
 		_pacman->position->X += pacmanFinalSpeed * elapsedTime; //Moves Pacman across X axis
@@ -385,7 +384,7 @@ void Pacman::UpdateMunchie(int elapsedTime) {
 }
 void Pacman::CheckGhostCollisions() {
 	for (int i = 0; i < GHOSTCOUNT; i++) {
-		if (CheckCollision(*_pacman->position, *_pacman->sourceRect, *_ghosts[i]->position, *_ghosts[i]->sourceRect)){
+		if (CheckCollision(*_pacman->position, *_pacman->sourceRect, *_ghosts[i]->position, *_ghosts[i]->sourceRect)) {
 			_pacman->lives--;
 			_pacman->dead = true;
 			i = GHOSTCOUNT;
@@ -898,7 +897,7 @@ void Grid::CreateMunchie(int i, int k, Texture2D* munchieTexture, int& m, Grid& 
 	_munchies[m]->frameTime = rand() % 500 + 50;
 	_munchies[m]->texture = munchieTexture;
 	_munchies[m]->rect = new Rect(11 + (32 * i), 10 + (32 * k), 12, 12);
-	_munchies[m]->originalRect =*_munchies[m]->rect;
+	_munchies[m]->originalRect = *_munchies[m]->rect;
 	_munchies[m]->sourceRect = new Rect(0.0f, 0.0f, 12, 12);
 	grid.empty[i][k] = true;
 	m++;
@@ -936,4 +935,26 @@ void Pacman::SnapToGrid(Vector2* position, const Vector2* gridPos)
 	newPos.Y = gridPos->Y * 32;
 	position->X = newPos.X;
 	position->Y = newPos.Y;
+}
+
+void Pacman::RestartLevel()
+{
+	for (int i = 0; i < MUNCHIECOUNT; i++) {
+		grid->_munchies[i]->rect = &grid->_munchies[i]->originalRect;
+	}
+	for (int i = 0; i < GHOSTCOUNT; i++) {
+		_ghosts[i]->position = new Vector2((32 * 14) + (32 * i), (32 * 11));
+	}
+	score = 0;
+	win = false;
+	gameOver = false;
+	_started = true;
+	collectedMunchies = 0;
+	_pacman->dead = false;
+	_pacman->lives = 3;
+	movingXPositive = false;
+	movingXNegative = false;
+	movingYPositive = false;
+	movingYNegative = false;
+	_pacman->position = new Vector2(32 * 15, 32 * 18);
 }
